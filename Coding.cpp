@@ -1,7 +1,5 @@
 #include "Coding.h"
 
-#include "Buffer.h"
-
 Coding::Coding(){
 	raw = 0;
 	length = 0;
@@ -49,7 +47,8 @@ void Coding::SetChar(unsigned char ch){
 
 typedef void(*WriteBin)(Coding::Binary);
 //一个流，传入一个函数处理这个流
-void Coding::GetStream(Buffer &buffer, void(*WriteBin)(Buffer&, Binary)){
+queue<Coding::Binary> Coding::GetStream(){
+	queue<Binary> qu;
 	for (int i = 1; i <= length; i++){
 		int index = i / 8;
 		int pos = 7 - ((i - 1) % 8);
@@ -59,16 +58,16 @@ void Coding::GetStream(Buffer &buffer, void(*WriteBin)(Buffer&, Binary)){
 
 		uchar bin = (code[index] & and) >> pos;
 
+		bool full = false;
 		switch (bin)
 		{
 		case 1:
-			//TODO
-			WriteBin(buffer, Binary::One);
+			qu.push(Binary::One);
 			break;
 		case 0:
-			WriteBin(buffer, Binary::Zero);
-			//TUDO
+			qu.push(Binary::Zero);
 			break;
 		}
 	}
+	return qu;
 }

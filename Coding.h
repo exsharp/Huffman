@@ -2,14 +2,12 @@
 #define _CODING_H_
 
 #include <iostream>
+#include <vector>
+#include <queue>
 using namespace std;
-
-#include "Tree.h"
 
 typedef unsigned char uchar;
 //Ã¿Ò»¸ö×Ö·û±àÂë
-
-class Buffer;
 
 class Coding{
 public:
@@ -39,8 +37,7 @@ public:
 	int GetLength(){
 		return length;
 	}
-	void GetStream(Buffer &buffer,void(*WriteBin)(Buffer&,Binary));
-	void GetStream(Node &Tree);
+	queue<Binary> GetStream();
 };
 #endif
 

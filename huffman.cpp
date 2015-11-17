@@ -1,6 +1,8 @@
 #include "huffman.h"
 #include "Schedule.h"
 
+
+
 Huffman::Huffman(string fileName)
 :fileLength(0)
 {
@@ -14,6 +16,8 @@ Huffman::Huffman(string fileName)
 	if (tail.find("hfm") < tail.length()){
 		//是哈夫曼文件
 
+		type = false;
+
 		tail.clear();
 
 		this->inFileName.assign(fileName.begin(), fileName.end());
@@ -23,13 +27,15 @@ Huffman::Huffman(string fileName)
 		outFileName += ".";
 	}
 	else{
+		type = true;
+
 		//不是哈夫曼文件
 		this->outFileName.assign(fileName.begin(),fileName.begin()+pos);
 		this->outFileName.append(".hfm");
 
 		//设置文件输入输出流
-		this->input.open(inFileName, ios::out | ios::binary);
-		this->output.open(outFileName, ios::app | ios::binary | ios::ate);
+		this->input.open(inFileName, ios::in | ios::binary);
+		this->output.open(outFileName, ios::out | ios::binary);
 	}
 }
 
@@ -53,7 +59,7 @@ bool Huffman::CountFrequency(){
 
 	//获得编码表
 	Tree tree(frequency);
-	tree.GetCode(code);
+	tree.GetCodeTable(code);
 
 	return true;
 }
@@ -89,10 +95,13 @@ void Huffman::WriteHead(){
 
 void Huffman::WriteCode(){
 
+	//Text
+	Schedule sche(1);
+
 	int code_len = code.size() - 1 ;
 	//写入字符的数量
 	output.write((char*)&code_len, sizeof(char));
-	for (int i = 0; i < code_len+1; i++){
+	for (int i = 0; i <= code_len; i++){
 		Coding _code = code.at(i);
 
 		// 获得各种属性
@@ -107,6 +116,8 @@ void Huffman::WriteCode(){
 		output.write((char*)&length, sizeof(char));
 		output.write((char*)tmp, sizeof(char)*code_length);
 
+		sche.WriteText(_code);
+
 		delete[] tmp;
 	}
 }
@@ -118,7 +129,7 @@ void Huffman::WriteData(){
 
 	uchar *buf = new uchar[BUFFER_LEN];
 	//写入文件的缓冲区
-	Buffer buffer(buf, 1, output);
+	Buffer buffer(buf, BUFFER_LEN); 
 
 	input.seekg(0, ios::beg);
 	while (input.tellg() < fileLength){
@@ -127,10 +138,20 @@ void Huffman::WriteData(){
 		//获得某个字符的信息
 		Coding _code = code.at(readChar);
 		//把这个字符的流写入缓冲
-		_code.GetStream(buffer,callback);
+		queue<Coding::Binary> qu = _code.GetStream();
+		while (!qu.empty()){
+			bool full = buffer.append(qu.front());
+			qu.pop();
+			if (full){
+				output.write((char*)buf, sizeof(char)*BUFFER_LEN);
+				buffer.clear();
+			}
+		}
 	}
 
-	buffer.flush();
+	unsigned int len = buffer.flush();
+	output.write((char*)buf, sizeof(char)*len);
+	
 	delete[] buf;
 }
 
@@ -166,7 +187,7 @@ void Huffman::ReadHead(){
 	else{
 		outFileName = outFileName + "_TEST." + tail ;
 		output.open(outFileName, ios::app | ios::binary | ios::ate);
-		output << "HelloWorld";
+		//output << "HelloWorld";
 	}
 	
 	//读取存入的标志
@@ -183,15 +204,20 @@ void Huffman::ReadHead(){
 }
 
 void Huffman::ReadCode(){
+
+	//TEXT
+	Schedule she(2);
+
 	uchar code_len = 0;
 	input.read((char*)&code_len, sizeof(uchar));
-	code_len++;//储存的时候减了一位
+	int len = code_len;//储存的时候减了一位
+	len = len + 1;
 	code.clear();
 
 	uchar raw;
 	uchar length;
 
-	for (int i = 0; i < code_len; i++){
+	for (int i = 0; i < len; i++){
 		vector<uchar> tmp_code(32);
 		input.read((char*)&raw, sizeof(char));
 		input.read((char*)&length, sizeof(char)); 
@@ -202,11 +228,39 @@ void Huffman::ReadCode(){
 
 		Coding _code(raw, length, tmp_code);
 		this->code.push_back(_code);
+
+		she.WriteText(_code);
 	}
 }
 
 void Huffman::WriteSourData(){
-
+	Tree tree(code);
+	uchar readChar;
+	uchar getChar;
+	bool canWrite = 0;
+	while (input.tellg() < fileLength){
+		input.read((char*)&readChar, sizeof(readChar));
+		for (int i = 7; i >= 0; i--){
+			uchar add = 1 << i;
+			uchar mask = readChar & add;
+			mask = mask >> i;
+			switch (mask)
+			{
+			case 1:
+				canWrite = tree.GetCode(Coding::Binary::One, getChar);
+				break;
+			case 0:
+				canWrite = tree.GetCode(Coding::Binary::Zero, getChar);
+				break;
+			default:
+				break;
+			}
+			if (canWrite){
+				cout << (char)getChar;
+				output.write((char*)&getChar, sizeof(uchar));
+			}
+		}
+	}
 }
 
 void Huffman::Decode(){
@@ -214,3 +268,11 @@ void Huffman::Decode(){
 	ReadCode();
 	WriteSourData();
 }
+
+void Huffman::run(){
+	if (type)
+		Encode();
+	else
+		Decode();
+}
+

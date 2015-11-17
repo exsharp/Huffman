@@ -6,36 +6,13 @@
 
 using namespace std;
 
-class Coding;
-
-class Node{
-public:
-	enum Direction{
-		LEFT,
-		RIGHT,
-		ROOT
-	};
-
-	unsigned char raw;
-	unsigned int weight;
-
-	Node *left;
-	Node *right;
-
-	Node();
-	Node(unsigned char raw, unsigned int weight);
-
-	class Compare{
-	public:
-		bool operator() (Node *n1, Node *n2){
-			return n1->weight > n2->weight;
-		}
-	};
-};
+#include "Node.h"
+#include "Coding.h"
 
 class Tree{
 private:
 	Node *tree;
+	Node *tmp;
 	int max_depth;
 	//vector<Coding> code;
 
@@ -48,7 +25,7 @@ public:
 	Tree();
 	//编码的时候的构造方法
 	Tree(const unsigned int feq[]);
-	Tree(vector<Coding> code);
+	Tree(const vector<Coding> &code);
 	//译码的时候的构造方法
 	//~Tree();//TODO 防止内存泄漏
 
@@ -56,6 +33,7 @@ public:
 	int GetDepth();
 
 	//获得字符表
-	void GetCode(vector<Coding> &code);
+	void GetCodeTable(vector<Coding> &code);
+	bool GetCode(Coding::Binary bin, uchar &ch);
 };
 #endif

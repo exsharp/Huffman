@@ -82,6 +82,7 @@
     <ClCompile Include="Coding.cpp" />
     <ClCompile Include="huffman.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Node.cpp" />
     <ClCompile Include="Schedule.cpp" />
     <ClCompile Include="Tree.cpp" />
   </ItemGroup>
@@ -89,6 +90,7 @@
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Coding.h" />
     <ClInclude Include="huffman.h" />
+    <ClInclude Include="Node.h" />
     <ClInclude Include="Schedule.h" />
     <ClInclude Include="Tree.h" />
   </ItemGroup>

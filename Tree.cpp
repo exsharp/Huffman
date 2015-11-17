@@ -1,23 +1,6 @@
 #include "Tree.h"
 #include "huffman.h"
 
-Node::Node(){
-	raw = 0;
-	weight = 0;
-	left = 0;
-	right = 0;
-}
-
-Node::Node(unsigned char raw, unsigned int weight){
-	//cout << (int)raw <<"  "<< weight << endl;
-	this->raw = raw;
-	this->weight = weight;
-	left = 0;
-	right = 0;
-}
-
-//-------------------------------------------------------
-
 Tree::Tree(){
 	this->tree = 0;
 	this->max_depth = 0;
@@ -55,9 +38,7 @@ Tree::Tree(const unsigned int feq[]){
 	this->tree = queue.top();
 }
 
-Tree::Tree(vector<Coding> code){
-	//this->code = code;
-}
+
 
 void Tree::_GetDepth(Node *tree,int depth){
 	
@@ -123,9 +104,71 @@ void Tree::_SetCoding(vector<Coding> &code,Node *tree, Coding _code, Node::Direc
 	}
 }
 
-void Tree::GetCode(vector<Coding> &code){
+void Tree::GetCodeTable(vector<Coding> &code){
 	Coding _code;
 	Node *tmp = tree;
 	_SetCoding(code,tmp, _code, Node::Direction::ROOT);
-	cout << "H";
+}
+
+Tree::Tree(const vector<Coding> &_code){
+	this->tree = new Node;
+	this->tmp = this->tree;
+	for (int i = 0; i < _code.size(); i++){
+		Coding code = _code.at(i);
+		Node *pt = this->tree;
+		queue<Coding::Binary> qu = code.GetStream();
+		while (!qu.empty()){
+			Coding::Binary ele = qu.front();
+			qu.pop();
+			switch (ele)
+			{
+			case Coding::Zero:
+				if (pt->left == 0){
+					Node *tmp = new Node;
+					pt->left = tmp;
+					pt = tmp;
+				}
+				else{
+					pt = pt->left;
+				}
+				break;
+			case Coding::One:
+				if (pt->right == 0){
+					Node *tmp = new Node;
+					pt->right = tmp;
+					pt = tmp;
+				}
+				else{
+					pt = pt->right;
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		pt->raw = code.GetChar();
+	}
+}
+
+bool Tree::GetCode(Coding::Binary bin, uchar &ch){
+	switch (bin)
+	{
+	case Coding::Zero:
+		tmp = tmp->left;
+		break;
+	case Coding::One:
+		tmp = tmp->right;
+		break;
+	default:
+		break;
+	}
+	if ((tmp->left == 0) &&
+		(tmp->right == 0)){
+		ch = tmp->raw;
+		tmp = tree;
+		return true;
+	}
+	else{
+		return false;
+	}
 }

@@ -26,6 +26,8 @@ private:
 	string outFileName;
 	string tail; //文件后缀
 
+	bool type; //true Encode false Decode
+
 	ofstream output;
 	ifstream input;
 
@@ -45,6 +47,8 @@ public:
 
 	void Encode();
 	void Decode();
+
+	void run();
 };
 
 #endif
