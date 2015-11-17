@@ -12,4 +12,5 @@ int main(){
 	//string filename = "C:\\Users\\zfliu\\Desktop\\go.exe";
 	Huffman huffman(filename);
 	huffman.Encode();
+	//huffman.Decode();
 }

@@ -4,6 +4,8 @@
 #include <iostream>
 using namespace std;
 
+#include "Tree.h"
+
 typedef unsigned char uchar;
 //每一个字符编码
 
@@ -21,7 +23,9 @@ private:
 	uchar length; //存储了多少个
 public:
 	Coding();
+	Coding(const Coding&);
 	Coding(uchar raw);
+	Coding(uchar raw, uchar length, vector<uchar> code);
 	void AddBit(Binary bin);
 	void SetChar(unsigned char ch);
 	unsigned char GetChar(){
@@ -35,8 +39,8 @@ public:
 	int GetLength(){
 		return length;
 	}
-	//typedef void(*WriteBin)(Buffer, Binary);
 	void GetStream(Buffer &buffer,void(*WriteBin)(Buffer&,Binary));
+	void GetStream(Node &Tree);
 };
 #endif
 

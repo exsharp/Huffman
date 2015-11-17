@@ -55,6 +55,10 @@ Tree::Tree(const unsigned int feq[]){
 	this->tree = queue.top();
 }
 
+Tree::Tree(vector<Coding> code){
+	//this->code = code;
+}
+
 void Tree::_GetDepth(Node *tree,int depth){
 	
 	if (0 == tree){
@@ -82,7 +86,7 @@ int Tree::GetDepth(){
 	return max_depth;
 }
 
-void Tree::_SetCoding(Node *tree, Coding _code, Node::Direction dir){
+void Tree::_SetCoding(vector<Coding> &code,Node *tree, Coding _code, Node::Direction dir){
 
 	//判断这是哪个方向，左边0，右边1
 	switch (dir)
@@ -114,14 +118,14 @@ void Tree::_SetCoding(Node *tree, Coding _code, Node::Direction dir){
 		code.push_back(_code);
 	}
 	else{
-		_SetCoding(tree->left, _code, Node::Direction::LEFT);
-		_SetCoding(tree->right, _code, Node::Direction::RIGHT);
+		_SetCoding(code,tree->left, _code, Node::Direction::LEFT);
+		_SetCoding(code,tree->right, _code, Node::Direction::RIGHT);
 	}
 }
 
-vector<Coding> Tree::GetCode(){
+void Tree::GetCode(vector<Coding> &code){
 	Coding _code;
 	Node *tmp = tree;
-	_SetCoding(tmp, _code, Node::Direction::ROOT);
-	return code;
+	_SetCoding(code,tmp, _code, Node::Direction::ROOT);
+	cout << "H";
 }

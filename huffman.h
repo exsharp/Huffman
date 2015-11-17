@@ -13,12 +13,16 @@ using namespace std;
 
 typedef unsigned char uchar;
 
+enum Error{
+	
+};
+
 class Huffman{
 	vector<Coding> code;
 
 private:
 	streampos fileLength;
-	string fileName;
+	string inFileName;
 	string outFileName;
 	string tail; //文件后缀
 
@@ -34,6 +38,8 @@ private:
 
 	// Decode
 	void ReadHead();
+	void ReadCode();
+	void WriteSourData();
 public:
 	Huffman(string fileName);
 
