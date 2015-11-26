@@ -19,22 +19,24 @@ Schedule::Schedule(int mode){
 
 void Schedule::SetProc(unsigned int percent){
 
-	cout << "[";
-	for (int i = 0; i < percent/2; i++){
-		cout << "*";
+	if (percent <= 100){
+		cout << "[";
+		for (int i = 0; i < percent / 2; i++){
+			cout << "*";
+		}
+		for (int i = 0; i < 50 - percent / 2; i++){
+			cout << " ";
+		}
+		cout << "]" << setiosflags(ios::fixed) << setprecision(4) << percent << "% ";
+		if (!tail.empty()){
+			cout << tail.c_str();
+		}
+		cout << "\r";
+		if (100 == percent){
+			cout << endl;
+		}
+		cout.flush();
 	}
-	for (int i = 0; i < 50 - percent/2; i++){
-		cout << " ";
-	}
-	cout << "]" << setiosflags(ios::fixed) << setprecision(4) << percent << "% ";
-	if (!tail.empty()){
-		cout << tail.c_str();
-	}
-	cout << "\r";
-	if (50 <= percent){
-		cout << endl;
-	}
-	cout.flush();
 }
 
 void Schedule::SetTail(string tail){

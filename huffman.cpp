@@ -7,28 +7,25 @@ Huffman::Huffman(string fileName)
 {
 	this->inFileName = fileName;
 	
-	//构造输出文件的名字
-	int pos = fileName.find_last_of('.');
 	//获取文件文件后缀
+	int pos = fileName.find_last_of('.');
 	this->tail.assign(fileName.begin() + pos + 1, fileName.end());
 
 	if (tail.find("hfm") < tail.length()){
+		type = false;
 		//是哈夫曼文件
 
-		type = false;
-
 		tail.clear();
-
-		this->inFileName.assign(fileName.begin(), fileName.end());
 		//把设置文件输入输出流放到ReadHead里面来做
+		this->inFileName.assign(fileName.begin(), fileName.end());
 		this->outFileName.assign(fileName.begin(), fileName.begin() + pos);
-		
-		outFileName += ".";
+		this->outFileName += ".";
 	}
 	else{
 		type = true;
-
 		//不是哈夫曼文件
+
+		//设置输出文件名
 		this->outFileName.assign(fileName.begin(),fileName.begin()+pos);
 		this->outFileName.append(".hfm");
 
@@ -51,7 +48,26 @@ bool Huffman::CountFrequency(){
 	input.seekg(0, ios::beg);
 
 	uchar readChar;
+
+	//以下为可视化
+	streampos newLength = fileLength - input.tellg();
+	int percent = (int)newLength / 100;
+	int count = 0;
+	Schedule she(0);
+	she.ShowText("正在统计频率");
+	//可视化结束
+
 	while (input.tellg() < fileLength){
+
+		//以下为可视化
+		if (0 == percent){
+			count++;
+			she.SetProc(count);
+			percent = (int)newLength / 100;
+		}
+		percent--;
+		//可视化结束
+
 		input.read((char*)&readChar,sizeof(readChar));
 		frequency[readChar]++;
 	}
@@ -94,9 +110,6 @@ void Huffman::WriteHead(){
 
 void Huffman::WriteCode(){
 
-	//Text
-	Schedule sche(1);
-
 	int code_len = code.size() - 1 ;
 	//写入字符的数量
 	output.write((char*)&code_len, sizeof(char));
@@ -115,8 +128,6 @@ void Huffman::WriteCode(){
 		output.write((char*)&length, sizeof(char));
 		output.write((char*)tmp, sizeof(char)*code_length);
 
-		sche.WriteText(_code);
-
 		delete[] tmp;
 	}
 	output << "CodingEnd";
@@ -131,17 +142,26 @@ void Huffman::WriteData(){
 	//写入文件的缓冲区
 	Buffer buffer(buf, BUFFER_LEN); 
 
+
+	//以下为可视化
+	int percent = (int)fileLength / 100;
+	int count = 0;
+	Schedule she(0);
+	she.ShowText("正在写入数据");
+	//可视化结束
+
 	input.seekg(0, ios::beg);
-	int pos = 0;
-	int num = 0;
 	while (input.tellg() < fileLength){
 
-		pos = pos + 1;
-		if (pos>10000){
-			pos = 0;
-			num++;
-			cerr << "out:"<<num<< endl;
+
+		//以下为可视化
+		if (0 == percent){
+			count++;
+			she.SetProc(count);
+			percent = (int)fileLength / 100;
 		}
+		percent--;
+		//可视化结束
 
 		uchar readChar;
 		input.read((char*)&readChar, sizeof(uchar));	
@@ -163,6 +183,8 @@ void Huffman::WriteData(){
 	output.write((char*)buf, sizeof(char)*len);
 	
 	delete[] buf;
+
+	she.ShowText("编码完成");
 }
 
 void Huffman::Encode(){
@@ -190,15 +212,15 @@ void Huffman::ReadHead(){
 		input.read((char*)&readChar, sizeof(uchar));
 		tail += readChar;
 	}
+
 	if (tail_count==10){
 		//尾巴长度大于10，出错
 		//TODO
 		assert(0);
 	}
 	else{
-		outFileName = outFileName + "_TEST." + tail ;
+		outFileName = outFileName + "OUT." + tail ;
 		output.open(outFileName, ios::app | ios::binary | ios::ate);
-		//output << "HelloWorld";
 	}
 	
 	//读取存入的标志
@@ -216,9 +238,6 @@ void Huffman::ReadHead(){
 }
 
 void Huffman::ReadCode(){
-
-	//TEXT
-	Schedule she(2);
 
 	uchar code_len = 0;
 	input.read((char*)&code_len, sizeof(uchar));
@@ -240,8 +259,6 @@ void Huffman::ReadCode(){
 
 		Coding _code(raw, length, tmp_code);
 		this->code.push_back(_code);
-
-		she.WriteText(_code);
 	}
 
 	//读取存入的标志
@@ -265,9 +282,26 @@ void Huffman::WriteSourData(){
 	uchar getChar;
 	bool canWrite = 0;
 
-	while (input.tellg() < fileLength){
-		input.read((char*)&readChar, sizeof(readChar));
 
+	//以下为可视化
+	int percent = (int)fileLength / 100;
+	int count = 0;
+	Schedule she(0);
+	she.ShowText("正在解码");
+	//可视化结束
+
+	while (input.tellg() < fileLength){
+
+		//以下为可视化
+		if (0 == percent){
+			count++;
+			she.SetProc(count);
+			percent = (int)fileLength / 100;
+		}
+		percent--;
+		//可视化结束
+
+		input.read((char*)&readChar, sizeof(readChar));
 		for (int i = 7; i >= 0; i--){
 			uchar add = 1 << i;
 			uchar mask = readChar & add;
