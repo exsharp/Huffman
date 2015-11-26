@@ -151,6 +151,7 @@ Tree::Tree(const vector<Coding> &_code){
 }
 
 bool Tree::GetCode(Coding::Binary bin, uchar &ch){
+
 	switch (bin)
 	{
 	case Coding::Zero:
@@ -160,8 +161,10 @@ bool Tree::GetCode(Coding::Binary bin, uchar &ch){
 		tmp = tmp->right;
 		break;
 	default:
+		cout << "ERROR" << endl;
 		break;
 	}
+
 	if ((tmp->left == 0) &&
 		(tmp->right == 0)){
 		ch = tmp->raw;

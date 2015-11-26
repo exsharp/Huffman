@@ -1,7 +1,6 @@
 #include "huffman.h"
 #include "Schedule.h"
-
-
+#include <assert.h>
 
 Huffman::Huffman(string fileName)
 :fileLength(0)
@@ -120,6 +119,7 @@ void Huffman::WriteCode(){
 
 		delete[] tmp;
 	}
+	output << "CodingEnd";
 }
 
 void Huffman::WriteData(){
@@ -132,7 +132,17 @@ void Huffman::WriteData(){
 	Buffer buffer(buf, BUFFER_LEN); 
 
 	input.seekg(0, ios::beg);
+	int pos = 0;
+	int num = 0;
 	while (input.tellg() < fileLength){
+
+		pos = pos + 1;
+		if (pos>10000){
+			pos = 0;
+			num++;
+			cerr << "out:"<<num<< endl;
+		}
+
 		uchar readChar;
 		input.read((char*)&readChar, sizeof(uchar));	
 		//获得某个字符的信息
@@ -183,6 +193,7 @@ void Huffman::ReadHead(){
 	if (tail_count==10){
 		//尾巴长度大于10，出错
 		//TODO
+		assert(0);
 	}
 	else{
 		outFileName = outFileName + "_TEST." + tail ;
@@ -200,6 +211,7 @@ void Huffman::ReadHead(){
 	{
 		//读不到相应的标志位，错误
 		//TODO
+		assert(0);
 	}
 }
 
@@ -231,15 +243,31 @@ void Huffman::ReadCode(){
 
 		she.WriteText(_code);
 	}
+
+	//读取存入的标志
+	char head[] = "CodingEnd";
+	//可能是因为停止符的原因，会读多一位
+	input.read((char*)&head, sizeof(head)-1);
+	int ret = strcmp(head, "CodingEnd");
+
+	if (0 != ret)
+	{
+		//读不到相应的标志位，错误
+		//TODO
+		assert(0);
+	}
 }
 
 void Huffman::WriteSourData(){
+
 	Tree tree(code);
 	uchar readChar;
 	uchar getChar;
 	bool canWrite = 0;
+
 	while (input.tellg() < fileLength){
 		input.read((char*)&readChar, sizeof(readChar));
+
 		for (int i = 7; i >= 0; i--){
 			uchar add = 1 << i;
 			uchar mask = readChar & add;
@@ -253,11 +281,12 @@ void Huffman::WriteSourData(){
 				canWrite = tree.GetCode(Coding::Binary::Zero, getChar);
 				break;
 			default:
+				assert(0);
 				break;
 			}
 			if (canWrite){
-				cout << (char)getChar;
 				output.write((char*)&getChar, sizeof(uchar));
+				output.flush();
 			}
 		}
 	}

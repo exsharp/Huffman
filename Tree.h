@@ -14,19 +14,22 @@ private:
 	Node *tree;
 	Node *tmp;
 	int max_depth;
-	//vector<Coding> code;
 
 	//获得深度
 	void _GetDepth(Node *tree,int depth);
 	void _SetCoding(vector<Coding> &code,
 		Node *tree, Coding _code, Node::Direction dir);
+	void _PrintTree();
 
 public:
 	Tree();
+
 	//编码的时候的构造方法
 	Tree(const unsigned int feq[]);
-	Tree(const vector<Coding> &code);
+
 	//译码的时候的构造方法
+	Tree(const vector<Coding> &code);
+
 	//~Tree();//TODO 防止内存泄漏
 
 	//获得深度的接口
@@ -35,5 +38,6 @@ public:
 	//获得字符表
 	void GetCodeTable(vector<Coding> &code);
 	bool GetCode(Coding::Binary bin, uchar &ch);
+	void PrintTree();
 };
 #endif

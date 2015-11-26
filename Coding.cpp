@@ -49,9 +49,9 @@ typedef void(*WriteBin)(Coding::Binary);
 //一个流，传入一个函数处理这个流
 queue<Coding::Binary> Coding::GetStream(){
 	queue<Binary> qu;
-	for (int i = 1; i <= length; i++){
+	for (int i = 0; i < length; i++){
 		int index = i / 8;
-		int pos = 7 - ((i - 1) % 8);
+		int pos = 7 - (i % 8);
 
 		//要相与的数
 		uchar and = 1 << pos;
