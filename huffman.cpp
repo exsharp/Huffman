@@ -44,6 +44,7 @@ bool Huffman::CountFrequency(){
 	//获得文件的长度
 	input.seekg(0, ios::end);
 	fileLength = input.tellg();
+	sourLength = fileLength;
 	input.seekg(0, ios::beg);
 
 	uchar readChar;
@@ -78,11 +79,6 @@ bool Huffman::CountFrequency(){
 	return true;
 }
 
-bool less_second(Coding & m1, Coding & m2) {
-	return m1.GetChar() < m2.GetChar();
-	//return m1.GetLength() < m2.GetLength();
-}
-
 void Huffman::Normailizing(){
 	// 把字符填充完整，共256个
 	bool map[256];
@@ -96,7 +92,7 @@ void Huffman::Normailizing(){
 			code.push_back(Coding(i));
 		}
 	}
-	sort(code.begin(), code.end(),less_second);
+	sort(code.begin(), code.end());
 }
 
 void Huffman::WriteHead(){
@@ -129,6 +125,9 @@ void Huffman::WriteCode(){
 
 		delete[] tmp;
 	}
+	uchar tmp[4] = { 0 };
+	this->itoc(sourLength, tmp);
+	output.write((char*)tmp, sizeof(char)*4);
 	output << "CodingEnd";
 }
 
@@ -260,6 +259,10 @@ void Huffman::ReadCode(){
 		this->code.push_back(_code);
 	}
 
+	uchar tmp[4] = { 0 };
+	input.read((char*)tmp, sizeof(char)* 4);
+	sourLength = ctoi(tmp);
+
 	//读取存入的标志
 	char head[] = "CodingEnd";
 	//可能是因为停止符的原因，会读多一位
@@ -317,7 +320,8 @@ void Huffman::WriteSourData(){
 				assert(0);
 				break;
 			}
-			if (canWrite){
+			if (canWrite && (sourLength!=0)){
+				sourLength--;
 				output.write((char*)&getChar, sizeof(uchar));
 				output.flush();
 			}

@@ -10,12 +10,14 @@ int main(int argc,char *argv[]){
 	//cout.rdbuf(os.rdbuf());
 
 	if (argc > 1){
-		string filename(argv[1]);// = "C:\\Users\\zfliu\\Desktop\\fuck\\main.hfm";
+		string filename(argv[1]); //= "C:\\Users\\zfliu\\Desktop\\aa.hfm";
 		Huffman huffman(filename);
 		huffman.run();
 	}
 	else{
-		assert("Can't open file in main");
+		cout << "Usage:" << "Huffman.exe XXX.XXX" << endl;
+		cout << "This EXE can auuto detect what type of file" << endl;
 	}
+
 	system("pause");
 }

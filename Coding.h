@@ -38,6 +38,9 @@ public:
 		return length;
 	}
 	queue<Binary> GetStream();
+	bool operator < (const Coding &co){
+		return this->raw < co.raw;
+	}
 };
 #endif
 
