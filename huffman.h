@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <assert.h>
 using namespace std;
 
 #include "Tree.h"

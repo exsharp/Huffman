@@ -1,6 +1,5 @@
 #include "huffman.h"
 #include "Schedule.h"
-#include <assert.h>
 
 Huffman::Huffman(string fileName)
 :fileLength(0)
